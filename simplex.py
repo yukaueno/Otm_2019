@@ -15,24 +15,65 @@ import numpy as np
 
 ######################################
 
-# FASE I
-# E que sao dados A = [B N]
+# {inicio da iteracao simplex}
+# Sao dados A = [B N]
 # tal que B^-1 existe e xB = B^-1b >= 0
 
 B = [[1,0],[0,1]]
 N = [[1,2],[2,1]]
 b = [[10],[10]]
+Bi = [3,4]
+Ni = [1,2]
+cB = [0,0]
+cN = [-1,-1]
 
-print((B,N))
-
-# FASE II
-# {inicio da iteracao simplex}
-
-#  Passo 1: {calculo da solucao basica}
+# {calculo da solucao basica factivel}
 
 Binv = np.linalg.inv(B)
-print((Binv))
+xB = np.matmul(Binv,b)
+xN = np.zeros(len(N[0]))
 
-xB = Binv*b
- 
+print("Solucao basica")
+print((xB,xN))
 
+# checando se a solucao basica encontrada eh factivel
+if (all(i>=0 for i in xB)) == False:
+	print("Solucao basica encontrada nao eh factivel")
+
+# {calculo dos custos reduzidos}
+lambdaT = np.matmul(cB,Binv)
+print((lambdaT))
+cNT_l = np.zeros(len(cN))
+
+for j in range(len(N[0])):
+	cNT_l[j] = cN[j] - np.matmul(lambdaT,N[j])
+
+# verifica se os custos sao positivos
+# se todos os custos sao positivos
+# a solucao corrente eh otima
+# senao vamos escolher j com cNT_l[j] < 0 
+k = -1
+
+for j in range(len(cNT_l)):
+	if (cNT_l[j] < 0):
+		k = j
+if (k == -1):
+	print("Encontramos uma solucao otima")
+else: 
+	dB = np.negative(np.matmul(Binv,N[k]))
+	epsilon = []
+	epsiloni = []
+	print("dB")
+	print((dB))
+	for i in range(len(dB)):
+		if (dB[i] < 0):
+			epsilon.append(-xB[i]/dB[i])
+			epsiloni.append(i)
+	if epsilon == []:
+		print("A solucao otima eh -infinito")
+	else:
+		# calculando o minimo dos episolons obtidos
+		# encontrando o indice
+		espsilonc = np.argmin(epsilon)
+		
+		# 
