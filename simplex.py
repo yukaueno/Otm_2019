@@ -75,5 +75,14 @@ else:
 		# calculando o minimo dos episolons obtidos
 		# encontrando o indice
 		espsilonc = np.argmin(epsilon)
-		
-		# 
+		epsiloni = 
+		# nova solucao basica apos a mudanca de base
+		#B = [[1,0],[0,1]]
+		#N = [[1,2],[2,1]]
+		#b = [[10],[10]]
+		#Bi = [3,4]
+		#Ni = [1,2]
+		#cB = [0,0]
+		#cN = [-1,-1]
+		aux = B[]
+		 
