@@ -42,7 +42,7 @@ if (all(i>=0 for i in xB)) == False:
 
 # {calculo dos custos reduzidos}
 lambdaT = np.matmul(cB,Binv)
-print((lambdaT))
+print((lambdaT))	
 cNT_l = np.zeros(len(cN))
 
 for j in range(len(N[0])):
@@ -62,20 +62,26 @@ if (k == -1):
 else: 
 	dB = np.negative(np.matmul(Binv,N[k]))
 	epsilon = []
-	epsiloni = []
+	
 	print("dB")
 	print((dB))
 	for i in range(len(dB)):
 		if (dB[i] < 0):
 			epsilon.append(-xB[i]/dB[i])
-			epsiloni.append(i)
+			
 	if epsilon == []:
 		print("A solucao otima eh -infinito")
 	else:
 		# calculando o minimo dos episolons obtidos
 		# encontrando o indice
-		espsilonc = np.argmin(epsilon)
-		epsiloni = 
+		aux = epsilon[0]	
+		epsiloni = 0
+		for index in range(len(epsilon)):
+			if aux > epsilon[index]:
+				aux = epsilon[index]
+				epsiloni = index
+		print("Epsilon")
+		print((epsiloni))
 		# nova solucao basica apos a mudanca de base
 		#B = [[1,0],[0,1]]
 		#N = [[1,2],[2,1]]
@@ -84,5 +90,26 @@ else:
 		#Ni = [1,2]
 		#cB = [0,0]
 		#cN = [-1,-1]
-		aux = B[]
+		
+		#PROBLEMAS AQUI....
+		auxB = B
+		auxN = N
+		B[:,epsiloni] = auxN[:,k]
+		N[:,k] = auxB[:epsiloni]
+		
+		# Atualizando os indices
+		for b in Bi:
+			if b == index:
+				Bi = k
+				break
+		for n in Ni:
+			if n == k:
+				Ni = index
+				break
+
+		print("Valores atualizados")
+		print("B",(B))
+		print("N",(N))
+		print("Bi",(Bi))
+		print("Ni",(Ni))
 		 
