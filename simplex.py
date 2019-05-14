@@ -20,28 +20,29 @@ import numpy as np
 # tal que B^-1 existe e xB = B^-1b >= 0
 
 B = np.array([[1,0],[0,1]])
-N = np.array([[1,2],[2,1]])
-b = np.array([[10],[10]])
+N = np.array([[-1,1],[2,-1]])
+b = np.array([[2],[6]])
 Bi = [3,4]
 Ni = [1,2]
 cB = [0,0]
 cN = [-1,-1]
 
-print("B\n",(B))
-print("N\n",(N))
-print("b\n",(b))
-print("Bi\n",(Bi))
-print("Ni\n",(Ni))
-print("cB\n",(cB))
-print("cN\n",(cN))
+print("B",(B))
+print("N",(N))
+print("Bi",(Bi))
+print("Ni",(Ni))
+print("cB",(cB))
+print("cN",(cN))
 
 # {calculo da solucao basica factivel}
 
 Binv = np.linalg.inv(B)
-xB = np.matmul(Binv,b)
-xN = np.zeros(len(N[0]))
+xB = np.dot(Binv,b)
+xN = np.zeros((len(N[0]),1))
 
-print("Solucao basica\n",(xB,xN))
+print("Solucao basica ",(xB,xN))
+
+print("###################################################")
 
 # checando se a solucao basica encontrada eh factivel
 if (all(i>=0 for i in xB)) == False:
@@ -50,65 +51,75 @@ if (all(i>=0 for i in xB)) == False:
 # {inicio da iteracao}
 # enquanto nao encontrar a solucao ou nao alcancar itr iteracoes
 
-itr = 1
-status = False
+#==============================================================
+itr = 5 
+#==============================================================
 
+status = False
 iteracao = 0
+
 while status == False and iteracao <= itr:
+
 	# {calculo dos custos reduzidos}
 
-	lambdaT = np.matmul(cB,Binv)
+	lambdaT = np.dot(cB,Binv)
 
-	print("lambdaT\n",(lambdaT))	
+	print("lambdaT",(lambdaT))	
 
 	cNT_l = np.zeros(len(cN))
 
 	for j in range(len(N[0])):
-		cNT_l[j] = cN[j] - np.matmul(lambdaT,N[j])
+		cNT_l[j] = cN[j] - np.dot(lambdaT,N[j])
 
 	# verificando se os custos sao positivos
 
-	k = -1
+	j = -1 
+	find = False
 	print("cNT_l\n", cNT_l)
-	for j in range(len(cNT_l)):
-		if (cNT_l[j] < 0):
-			k = j 
+	for i in range(len(cNT_l)):
+		if (cNT_l[i] < 0) and find == False:
+			j = i
+			find == True 
 
 	# se todos os custos sao positivos
 	# a solucao corrente eh otima
-	if (k == -1):
+	if (j == -1):
 		print("Encontramos uma solucao otima")
 		status = True
 		break
 	# senao vamos escolher j com cNT_l[j] < 0
 	else: 
-		print("Elemento que vai entrar: k = ",k)
-		dB = np.negative(np.matmul(Binv,N[k]))
-		epsilon = []
-	
-		print("dB\n",(dB))
+		print("Elemento que vai entrar: j = ",j)
+
+		dB = np.negative(np.dot(Binv,N[j]))	
+		print("dB ",(dB))
+		
+		l = []
+		e = []
 		for i in range(len(dB)):
 			if (dB[i] < 0):
-				epsilon.append(-xB[i]/dB[i])
-		print("epsilon\n",epsilon)	
-		# se nao existir epsilon, significa que o problema nunca se torna infactivel
-		if epsilon == []:
+				l.append(i)
+				e.append(-xB[i]/dB[i])
+		print("l ",l)	
+		# se todos os componentes de dB forem positivos temos que o problemas eh infactivel
+		if l == []:
 			print("A solucao otima eh -infinito")
 			status = True
+			break
 		else:
 			# calculando o minimo dos epsilons obtidos
 			# encontrando o indice do primeiro minimo dentre os elemetos de epsolons
 			# supomos que o primeiro elemento eh o minimo
-			epsilone = epsilon[0]	
-			epsiloni = 0
+			l = 0
+			emin = e[0]
 			# comparamos com o resto dos elementos
 			# caso encontramos algum elemento que seja menor, atualizamos a variavel auxiliar
-			for index in range(len(epsilon)):
-				if epsilone > epsilon[index]:
-					epsilone = epsilon[index]
-					epsiloni = index
+			for i in range(len(e)):
+				if emin > e[i]:
+					emin = e[i]
+					l = i
 
-			print("Elemento que vai sair: ",Bi[epsiloni])
+			print("Elemento que vai sair: ",Bi[l])
 		
 			# nova solucao basica apos a mudanca de base
 			#B = [[1,0],[0,1]]
@@ -120,26 +131,25 @@ while status == False and iteracao <= itr:
 			#cN = [-1,-1]
 			
 			auxB = []
-			for b in B[:,epsiloni]:
+			for b in B[:,l]:
 				auxB.append(b)
 			auxB = np.array(auxB)	
 			auxN = N
 			print("auxB\n",auxB)
 			print("auxN\n",auxN)
-			B[:,epsiloni] = N[:,k]
+			B[:,l] = N[:,j]
 			print("auxB\n",auxB)
-			N[:,k] = auxB
+			N[:,j] = auxB
 			
 			# Atualizando os indices
-			auxi = Bi[epsiloni]
-			Bi[epsiloni] = k + 1
-			print("k\n",k)
-			Ni[k] = auxi
+			auxl = Bi[l]
+			Bi[l] = Ni[j]
+			Ni[j] = auxl
 			
 			# Atualizando os custos
-			auxci = cB[epsiloni]
-			cB[epsiloni] = k + 1
-			cN[k] = auxci
+			auxci = cB[l]
+			cB[l] = Ni[j]
+			cN[j] = auxci
 			print("Valores atualizados")
 			print("B",(B))
 			print("N",(N))
@@ -147,9 +157,12 @@ while status == False and iteracao <= itr:
 			print("Ni",(Ni))
 			
 			# {calculo da solucao basica}	
-			xB[epsiloni] = xB[epsiloni] + epsilone*dB[epsiloni]
-			xN[k] = epsilone 
-
+			for ib in range(len(xB)):
+				if ib != l:
+					xB[ib] = xB[ib] + emin*dB[ib]
+			xN[j] = emin 
+			
+			print("###########################################")
 			print("Solucao basica\n",(xB,xN))
 
 			iteracao = iteracao + 1
